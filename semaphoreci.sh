@@ -52,17 +52,23 @@ tg_sendstick() {
         -d chat_id="$CHANNEL_ID"
 }
 pushInfo() {
-    TOOLCHAIN=$(cat out/include/generated/compile.h | grep LINUX_COMPILER | cut -d '"' -f2)
+    if [[ $DEVICE =~ "lavender" ]];
+    then
+        NAME="REDMI NOTE 7"
+    else
+        NAME="REDMI NOTE 6 PRO"
+    fi
+    TOOLCHAIN=$(cat out/include/generated/compile.h | grep LINUX_COMPILER | cut -d '"' -f2 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')
     UTS=$(cat out/include/generated/compile.h | grep UTS_VERSION | cut -d '"' -f2)
     KERNEL=$(cat out/.config | grep Linux/arm64 | cut -d " " -f3)
     tg_sendstick
-    tg_channelcast "<b>New GenomKernel build is available!</b>" \
+    tg_channelcast "<b>New Genom Kernel build available!</b>" \
         "" \
-        "<b>Device :</b> <code>REDMI NOTE 7</code>" \
-        "<b>Kernel version :</b> <code>Linux ${KERNEL}</code>" \
-        "<b>UTS version :</b> <code>${UTS}</code>" \
-        "<b>Toolchain :</b> <code>${TOOLCHAIN}</code>" \
-        "<b>Latest commit :</b> <code>$(git log --pretty=format:'"%h : %s"' -1)</code>"
+        "Device : <b>$NAME</b>" \
+        "Kernel version : <b>Linux ${KERNEL}</b>" \
+        "UTS version : <b>${UTS}</b>" \
+        "Toolchain : <b>${TOOLCHAIN}</b>" \
+        "Latest commit : <b>$(git log --pretty=format:'"%h : %s"' -1)</b>"
 }
 # Build kernel
 makeKernel () {
