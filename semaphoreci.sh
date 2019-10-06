@@ -3,33 +3,36 @@
 # Copyright (C) 2018-2019 Rama Bondan Prakoso (rama982)
 #
 # SemaphoreCI Classic Kernel Build Script
-# For Redmi Note 7 (lavender)
+# For sdm660
+
+# Export var
+export DEVICE
+export CONFIG_MIUI
+export CONFIG_AOSP
+export CONFIG_Q
+export CHANNEL_ID
+export TELEGRAM_TOKEN
 
 # Main environtment
 export TZ=":Asia/Jakarta"
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 KERNEL_DIR=${HOME}/$(basename $(pwd))
 ZIP_DIR=$KERNEL_DIR/AnyKernel3
-CONFIG_MIUI=lavender-miui_defconfig
-CONFIG_AOSP=lavender-aosp_defconfig
-CONFIG_Q=lavender-perf_defconfig
 KERN_IMG=$KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb
 
 # Install build package
-install-package --update-new bc bash git-core gnupg build-essential \
+install-package --update-new bc bash git-core gnupg build-essential ccache \
     zip curl make automake autogen autoconf autotools-dev libtool shtool python \
     m4 gcc libtool zlib1g-dev gcc-aarch64-linux-gnu flex
 
 # Clone depedencies
 git clone --depth=1 https://github.com/fabianonline/telegram.sh telegram
-git clone --depth=1 https://github.com/crDroidMod/android_prebuilts_clang_host_linux-x86_clang-5799447 clang
-git clone --depth=1 https://github.com/rama982/AnyKernel3 -b lavender
+git clone --depth=1 https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-5900059 clang
+git clone --depth=1 https://github.com/rama982/AnyKernel3 -b $DEVICE
 git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-9.0.0_r39 stock
 git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-9.0.0_r39 stock_32
 
 #   TELEGRAM   #
-export CHANNEL_ID
-export TELEGRAM_TOKEN
 TELEGRAM=telegram/telegram
 pushKernel() {
 	curl -F document=@$(echo $ZIP_DIR/*.zip)  "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument" \
