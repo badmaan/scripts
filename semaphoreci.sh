@@ -7,9 +7,7 @@
 
 # Export var
 export DEVICE
-export CONFIG_MIUI
-export CONFIG_AOSP
-export CONFIG_Q
+export CONFIG
 export CHANNEL_ID
 export TELEGRAM_TOKEN
 
@@ -74,7 +72,7 @@ pushInfo() {
 makeKernel () {
     export KBUILD_BUILD_USER="ramakun"
     PATH="${KERNEL_DIR}/clang/bin:${KERNEL_DIR}/stock/bin:${KERNEL_DIR}/stock_32/bin:${PATH}"
-    make O=out ARCH=arm64 $1
+    make O=out ARCH=arm64 $CONFIG
     make -j$(nproc --all) O=out \
                           ARCH=arm64 \
                           CC=clang \
@@ -115,19 +113,20 @@ cleanZip () {
 
 if [[ $BRANCH =~ "10" ]];
 then
-    makeKernel $CONFIG_Q
+    makeKernel
     makeZip
     pushInfo
     pushKernel
 else
     #MIUI Build
-    makeKernel $CONFIG_MIUI
+    makeKernel
     modules
     makeZip
     pushInfo
     pushKernel
     # AOSP
-    makeKernel $CONFIG_AOSP
+    sed -i 's/WLAN=m/WLAN=y/g' $CONFIG
+    makeKernel
     cleanZip
     makeZip
     pushKernel
