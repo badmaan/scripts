@@ -118,6 +118,7 @@ then
     pushInfo
     pushKernel
 else
+    echo MIUI > type
     #MIUI Build
     makeKernel
     modules
@@ -125,6 +126,7 @@ else
     pushInfo
     pushKernel
     # AOSP
+    echo AOSP > type
     sed -i 's/WLAN=m/WLAN=y/g' $CONFIG
     makeKernel
     cleanZip
