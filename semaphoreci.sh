@@ -17,6 +17,7 @@ BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 KERNEL_DIR=${HOME}/$(basename $(pwd))
 ZIP_DIR=$KERNEL_DIR/AnyKernel3
 KERN_IMG=$KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb
+CONFIG_PATH=$KERNEL_DIR/arch/arm64/configs/$CONFIG
 
 # Install build package
 install-package --update-new bc bash git-core gnupg build-essential ccache \
@@ -127,7 +128,7 @@ else
     pushKernel
     # AOSP
     echo AOSP > type
-    sed -i 's/WLAN=m/WLAN=y/g' $CONFIG
+    sed -i 's/WLAN=m/WLAN=y/g' $CONFIG_PATH
     makeKernel
     cleanZip
     makeZip
