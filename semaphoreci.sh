@@ -18,6 +18,7 @@ KERNEL_DIR=${HOME}/$(basename $(pwd))
 ZIP_DIR=$KERNEL_DIR/AnyKernel3
 KERN_IMG=$KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb
 CONFIG_PATH=$KERNEL_DIR/arch/arm64/configs/$CONFIG
+PATH="${KERNEL_DIR}/clang/bin:${KERNEL_DIR}/stock/bin:${KERNEL_DIR}/stock_32/bin:${PATH}"
 
 # Install build package
 install-package --update-new bc bash git-core gnupg build-essential ccache \
@@ -70,9 +71,21 @@ pushInfo() {
         "Latest commit : <b>$(git log --pretty=format:'"%h : %s"' -1)</b>"
 }
 # Build kernel
-makeKernel () {
+makeKernelGcc () {
     export KBUILD_BUILD_USER="ramakun"
-    PATH="${KERNEL_DIR}/clang/bin:${KERNEL_DIR}/stock/bin:${KERNEL_DIR}/stock_32/bin:${PATH}"
+    make O=out ARCH=arm64 $CONFIG
+    make -j$(nproc --all) O=out \
+                          ARCH=arm64 \
+                          CROSS_COMPILE=aarch64-linux-android- \
+                          CROSS_COMPILE_ARM32=arm-linux-androideabi-
+
+    if ! [ -a $KERN_IMG ]; then
+        tg_channelcast "<b>BuildCI report status:</b> There are build running but its error, please fix and remove this message!"
+        exit 1
+    fi
+}
+makeKernelClang () {
+    export KBUILD_BUILD_USER="ramakun"
     make O=out ARCH=arm64 $CONFIG
     make -j$(nproc --all) O=out \
                           ARCH=arm64 \
@@ -114,16 +127,16 @@ cleanZip () {
 
 if [[ $BRANCH =~ "10" ]];
 then
-    makeKernel
+    makeKernelGcc
     makeZip
     pushInfo
     pushKernel
 else
     #UNIFIED Build
-    makeKernel
+    makeKernelClang
     modules
     sed -i 's/WLAN=m/WLAN=y/g' $CONFIG_PATH
-    makeKernel
+    makeKernelClang
     makeZip
     pushInfo
     pushKernel
