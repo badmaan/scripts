@@ -127,7 +127,7 @@ cleanZip () {
 
 if [[ $BRANCH =~ "10" ]];
 then
-    makeKernelGcc
+    makeKernelClang
     makeZip
     pushInfo
     pushKernel
