@@ -118,11 +118,11 @@ modules () {
     echo -e "\n(i) Done moving modules"
 }
 makeZip () {
-    cp $KERN_IMG $ZIP_DIR/zImage
+    cp $KERN_IMG $ZIP_DIR
     make -C $ZIP_DIR normal
 }
 cleanZip () {
-    make -C $ZIP_DIR clean &>/dev/null
+    make -C $ZIP_DIR clean
 }
 
 if [[ $BRANCH =~ "10" ]];
