@@ -56,6 +56,9 @@ pushInfo() {
     if [[ $DEVICE =~ "lavender" ]];
     then
         NAME="Redmi Note 7/7S"
+    elif [[ $DEVICE =~ "ginkgo" ]];
+    then
+        NAME="Redmi Note 8"
     else
         NAME="Redmi Note 6 Pro"
     fi
