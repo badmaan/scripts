@@ -5,6 +5,13 @@
 # SemaphoreCI Classic Kernel Build Script
 # For sdm660
 
+# Clone depedencies
+git clone --depth=1 https://github.com/fabianonline/telegram.sh telegram
+git clone --depth=1 https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-5900059 clang
+git clone --depth=1 https://github.com/rama982/AnyKernel3 -b $DEVICE
+git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-9.0.0_r50 stock
+git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-9.0.0_r50 stock_32
+
 # Export var
 export DEVICE
 export CONFIG
@@ -25,13 +32,6 @@ export KBUILD_COMPILER_STRING="$(${KERNEL_DIR}/clang/bin/clang --version | head 
 install-package --update-new bc bash git-core gnupg build-essential ccache \
     zip curl make automake autogen autoconf autotools-dev libtool shtool python \
     m4 gcc libtool zlib1g-dev gcc-aarch64-linux-gnu flex
-
-# Clone depedencies
-git clone --depth=1 https://github.com/fabianonline/telegram.sh telegram
-git clone --depth=1 https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-5900059 clang
-git clone --depth=1 https://github.com/rama982/AnyKernel3 -b $DEVICE
-git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-9.0.0_r50 stock
-git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-9.0.0_r50 stock_32
 
 #   TELEGRAM   #
 TELEGRAM=telegram/telegram
