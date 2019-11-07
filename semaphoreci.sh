@@ -14,11 +14,12 @@ export TELEGRAM_TOKEN
 # Main environtment
 export TZ=":Asia/Jakarta"
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-KERNEL_DIR=${HOME}/$(basename $(pwd))
+KERNEL_DIR=$(pwd)
 ZIP_DIR=$KERNEL_DIR/AnyKernel3
 KERN_IMG=$KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb
 CONFIG_PATH=$KERNEL_DIR/arch/arm64/configs/$CONFIG
 PATH="${KERNEL_DIR}/clang/bin:${KERNEL_DIR}/stock/bin:${KERNEL_DIR}/stock_32/bin:${PATH}"
+export KBUILD_COMPILER_STRING="$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
 
 # Install build package
 install-package --update-new bc bash git-core gnupg build-essential ccache \
@@ -48,27 +49,23 @@ tg_channelcast() {
 }
 tg_sendstick() {
     curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendSticker" \
-        -d sticker="CAADBQADCgADVxIpHaFgYtltlYK2Ag" \
+        -d sticker="CAADBQADCwADfmlfEgEtqXB1SD3FFgQ" \
         -d chat_id="$CHANNEL_ID"
 }
 pushInfo() {
     if [[ $DEVICE =~ "lavender" ]];
     then
-        NAME="REDMI NOTE 7"
+        NAME="Redmi Note 7/7S"
     else
-        NAME="REDMI NOTE 6 PRO"
+        NAME="Redmi Note 6 Pro"
     fi
-    TOOLCHAIN=$(cat out/include/generated/compile.h | grep LINUX_COMPILER | cut -d '"' -f2 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')
-    UTS=$(cat out/include/generated/compile.h | grep UTS_VERSION | cut -d '"' -f2)
     KERNEL=$(cat out/.config | grep Linux/arm64 | cut -d " " -f3)
     tg_sendstick
-    tg_channelcast "<b>New Genom Kernel build available!</b>" \
-        "" \
-        "Device : <b>$NAME</b>" \
-        "Kernel version : <b>Linux ${KERNEL}</b>" \
-        "UTS version : <b>${UTS}</b>" \
-        "Toolchain : <b>${TOOLCHAIN}</b>" \
-        "Latest commit : <b>$(git log --pretty=format:'"%h : %s"' -1)</b>"
+    tg_channelcast "New build available!" \
+        "Device : <code>$NAME</code>" \
+        "Toolchain : <code>${KBUILD_COMPILER_STRING}</code>" \
+        "Branch : <code>${BRANCH}</code>" \
+        "Commit Point : <code>$(git log --pretty=format:'"%h : %s"' -1)</code>"
 }
 # Build kernel
 makeKernelGcc () {
