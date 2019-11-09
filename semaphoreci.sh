@@ -23,7 +23,8 @@ export TZ=":Asia/Jakarta"
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 KERNEL_DIR=$(pwd)
 ZIP_DIR=$KERNEL_DIR/AnyKernel3
-KERN_IMG=$KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb
+DTBS=$KERNEL_DIR/out/arch/arm64/boot/dts/qcom
+KERN_IMG=$KERNEL_DIR/out/arch/arm64/boot/Image.gz
 CONFIG_PATH=$KERNEL_DIR/arch/arm64/configs/$CONFIG
 PATH="${KERNEL_DIR}/clang/bin:${KERNEL_DIR}/stock/bin:${KERNEL_DIR}/stock_32/bin:${PATH}"
 export KBUILD_COMPILER_STRING="$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
@@ -33,12 +34,15 @@ install-package --update-new bc bash git-core gnupg build-essential ccache \
     zip curl make automake autogen autoconf autotools-dev libtool shtool python \
     m4 gcc libtool zlib1g-dev gcc-aarch64-linux-gnu flex
 
-#   TELEGRAM   #
+#TELEGRAM
+
 TELEGRAM=telegram/telegram
+
 pushKernel() {
 	curl -F document=@$(echo $ZIP_DIR/*.zip)  "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument" \
 			-F chat_id="$CHANNEL_ID"
 }
+
 tg_channelcast() {
     "${TELEGRAM}" -c ${CHANNEL_ID} -H \
         "$(
@@ -47,11 +51,13 @@ tg_channelcast() {
             done
         )"
 }
+
 tg_sendstick() {
     curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendSticker" \
         -d sticker="CAADBQADCwADfmlfEgEtqXB1SD3FFgQ" \
         -d chat_id="$CHANNEL_ID"
 }
+
 pushInfo() {
     if [[ $DEVICE =~ "lavender" ]];
     then
@@ -70,7 +76,9 @@ pushInfo() {
         "Branch : <code>${BRANCH}</code>" \
         "Commit Point : <code>$(git log --pretty=format:'"%h : %s"' -1)</code>"
 }
+
 # Build kernel
+
 makeKernelGcc () {
     export KBUILD_BUILD_USER="ramakun"
     make O=out ARCH=arm64 $CONFIG
@@ -84,6 +92,7 @@ makeKernelGcc () {
         exit 1
     fi
 }
+
 makeKernelClang () {
     export KBUILD_BUILD_USER="ramakun"
     make O=out ARCH=arm64 $CONFIG
@@ -99,6 +108,7 @@ makeKernelClang () {
         exit 1
     fi
 }
+
 modules () {
     # credit @adekmaulana
     VENDOR_MODULEDIR="$ZIP_DIR/modules/vendor/lib/modules"
@@ -117,10 +127,13 @@ modules () {
     done
     echo -e "\n(i) Done moving modules"
 }
+
 makeZip () {
-    cp $KERN_IMG $ZIP_DIR
+    cp $DTBS/*.dtb $ZIP_DIR/dtbs
+    cp $KERN_IMG $ZIP_DIR/kernel
     make -C $ZIP_DIR normal
 }
+
 cleanZip () {
     make -C $ZIP_DIR clean
 }
@@ -132,7 +145,7 @@ then
     pushInfo
     pushKernel
 else
-    #UNIFIED Build
+    #Unify Build
     makeKernelClang
     modules
     sed -i 's/WLAN=m/WLAN=y/g' $CONFIG_PATH
