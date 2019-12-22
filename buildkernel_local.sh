@@ -23,7 +23,7 @@ PATH="${KERNEL_DIR}/clang/bin:${KERNEL_DIR}/stock/bin:${KERNEL_DIR}/stock_32/bin
 export KBUILD_COMPILER_STRING="$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
 
 makeKernelClang () {
-    export KBUILD_BUILD_USER="ramakun"
+    export KBUILD_BUILD_USER="isamet"
     make O=out ARCH=arm64 $CONFIG
     make -j$(nproc --all) O=out \
                           ARCH=arm64 \
