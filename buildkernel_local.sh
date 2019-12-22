@@ -21,7 +21,7 @@ ZIP_DIR=$KERNEL_DIR/AnyKernel3
 KERN_IMG=$KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb
 PATH="${KERNEL_DIR}/clang/bin:${KERNEL_DIR}/stock/bin:${KERNEL_DIR}/stock_32/bin:${PATH}"
 export KBUILD_COMPILER_STRING="$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
-
+export CROSS_COMPILE_ARM32=$(pwd)/stock_32/bin/
 makeKernelClang () {
     export KBUILD_BUILD_USER="isamet"
     make O=out ARCH=arm64 $CONFIG
